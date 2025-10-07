@@ -1,8 +1,10 @@
 import os
 import requests
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 ACCESS_TOKEN = os.environ.get("CHANNEL_ACCESS_TOKEN")
 
@@ -22,6 +24,7 @@ def notify_line(access_token, user_id, message):
         ]
     }
     response = requests.post(url, headers=headers, json=data)
+    print("LINE API response:", response.status_code, response.text)  # ここを追加
     return response.status_code, response.text
 
 @app.route('/send_message', methods=['POST'])
