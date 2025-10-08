@@ -47,5 +47,34 @@ def fall_detected():
     status, resp = notify_line(ACCESS_TOKEN, user_id, message)
     return jsonify({'status': status, 'response': resp})
 
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    try:
+        event = request.get_json()['events'][0]
+        user_id = event['source']['userId']
+        reply_token = event['replyToken']
+        reply_message = f"あなたのUser_IDは{user_id}です。"
+
+        url = "https://api.line.me/v2/bot/message/reply"
+        headers = {
+            "Authorization": f"Bearer {ACCESS_TOKEN}",
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "replyToken": reply_token,
+            "messages": [
+                {
+                    "type": "text",
+                    "text": reply_message
+                }
+            ]
+        }
+        response = requests.post(url, headers=headers, json=payload)
+        print("LINE reply response:", response.status_code, response.text)
+        return jsonify({'status': 'ok'}), 200
+    except Exception as e:
+        print("Webhook error:", e)
+        return jsonify({'error': str(e)}), 400
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
