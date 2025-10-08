@@ -42,6 +42,7 @@ def fall_detected():
     req_data = request.get_json()
     user_id = req_data.get('user_id')
     if not user_id:
+        print("fall_detected: user_id is empty")  # 追加
         return jsonify({'error': 'user_id is required'}), 400
     message = "転倒が検知されました！ご注意ください。"
     status, resp = notify_line(ACCESS_TOKEN, user_id, message)
